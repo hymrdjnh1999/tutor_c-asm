@@ -19,6 +19,7 @@ struct contact {
 int enterSelect();
 void mainMenu();
 void displayContacts(contact* contact,int contactLength);
+void displayWhiteSpace(int length);
 void displayThroughLine(int width);
 void clearScreen();
 void enterToContinue();
@@ -140,16 +141,29 @@ void displayContacts(contact* contacts,int contactLength){
     displayThroughLine(lineWidth);
     for (int index = 0;  index< contactLength;  index++)
     {
-        char *fullName = strcat(contacts[index].firstName," ");
-        fullName = strcat(fullName,contacts[index].middleName);
-        fullName = strcat(fullName," ");
-        fullName = strcat(fullName,contacts[index].lastName);
+    
         int rank = index + 1;
-        printf("| %-4d | %-41s |\n",rank,fullName);
+        char* firstName = contacts[index].firstName;
+        char* middleName= contacts[index].middleName;
+        char* lastName= contacts[index].lastName;
+        int fullNameLength = strlen(firstName) + strlen(middleName) + strlen(lastName);
+        int restLength = 50 - fullNameLength;
+        char * message = "| %-4d | %s %s %s";
+        printf(message,fullNameLength,firstName,middleName,lastName);
+        displayWhiteSpace(restLength - fullNameLength);
+        printf("|\n");
+
     }
     
     enterToContinue();
 
+}
+void displayWhiteSpace(int length){
+    
+    for (int i = 0; i < length; i++)
+    {
+        printf(" ");
+    }
 }
 void displayThroughLine(int width){
     printf("+");
