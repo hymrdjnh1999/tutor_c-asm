@@ -8,12 +8,19 @@ struct contact {
     char lastName[20];
     char company[40];
     char phoneNumber[20];
+    char email[100];
     char address[40];
     char birthday[20];
     char website[40];
     char note[80];
     bool isFavouriteContact;
+    newContactField* fields;
 } typedef contact;
+
+struct newContactField{
+    char fieldName[100];
+    char fieldValue[100];
+}typedef newContactField;
 
 
 const int lineWidth = 50;
@@ -28,35 +35,15 @@ void enterToContinue();
 void enterToViewDetail(int contactLength,contact *contacts);
 void displayContactDetail(contact* contacts,int contactIndex);
 void displayEqualCharacter();
+int getIntNumber(char * title);
+void getInput(char* title,char * errorContent,char * resource);
+void contactDetailSubmenu(contact currentContact);
+// main
 int main(int argc,char const *argv[])
 {
     char line[] = "==========================================\n";
     mainMenu(line);
     return 0;
-}
-
-// int enterSelect(char *line){
-    
-//     return choice;
-// }
-
-void enterData(char* title,char * content,char *input){
-    char output [100];
-    int length = 0;
-    int count = 0;
-    do
-    {
-        if(count != 0){
-            printf(content);
-            printf(" must at least 6 characters!\n");
-        }
-        printf(title);
-        fflush(stdin);
-        scanf("%[^\n]s",input);
-        fflush(stdin);
-        count+=1;
-    } while (!strlen(input));
-    // return output;
 }
 
 contact addContact(char *line ){
@@ -65,11 +52,12 @@ contact addContact(char *line ){
     printf(line);
     printf(" CREATE NEW CONTACT\n");
     printf(line);
-    enterData(" First name : ","First name" ,newContact.firstName);
-    enterData(" Middle name : ","Middle name",newContact.middleName);
-    enterData(" Last name : ","Middle name",newContact.lastName);
+    getInput(" First name : "," First name" ,newContact.firstName);
+    getInput(" Middle name : "," Middle name",newContact.middleName);
+    getInput(" Last name : "," Last name",newContact.lastName);
     // enterData(" Company : ","Company",newContact.company);
     // enterData(" Phone number : ","Phone number",newContact.phoneNumber);
+    // enterData(" Email : ","Email",newContact.email);
     // enterData(" Address : ","Address",newContact.address);
     // enterData(" Birthdate : ","Birthdate",newContact.birthday);
     // enterData(" Website : ","Website",newContact.website);
@@ -78,7 +66,6 @@ contact addContact(char *line ){
     printf(line);
     printf("Create contact complete!\n");
     enterToContinue();
-    
     return newContact;
 } 
 
@@ -100,20 +87,7 @@ void mainMenu(char *line){
     printf("4. DISPLAY ALL CONTACT\n");
     printf("5. EXIT APPLICATION\n");
     printf(line);
-    printf(" #YOUR CHOICE: ");
-    int test;
-    if(scanf("%d",&choice)){
-        fflush(stdin);
-        if(choice< 1 || choice > 5){
-            system("cls");
-            printf("Please enter in range from 1 to 5!\n");
-        }
-    }
-    else{
-        fflush(stdin);
-        system("cls");
-        printf("Wrong input. Please re-enter!\n");
-    }
+    choice = getIntNumber(" #YOUR CHOICE: ");
     switch (choice)
     {
         case 1:
@@ -208,7 +182,6 @@ void enterToViewDetail(int contactLength,contact* contacts){
             }
         do
         {
-            
             if(!isCorrectDataType){
                 isCorrectRange = true;
                 printf("WRONG INPUT! PLEASE RE-ENTER.\n");
@@ -224,6 +197,41 @@ void enterToViewDetail(int contactLength,contact* contacts){
     }
     displayContactDetail(contacts,choice);
 }
+int getIntNumber(char * title){
+    int choice ;
+    bool isCorrectDataType = true;
+    char buffer[200];
+    do
+        {
+            
+            if(!isCorrectDataType){
+                printf("WRONG INPUT! PLEASE RE-ENTER.\n");
+            }
+            printf(title);
+            fgets( buffer, sizeof(buffer), stdin );
+            isCorrectDataType = false;
+        } while (sscanf(buffer,"%d",&choice) != 1);
+    // is correct data type
+    return choice;
+}
+
+void getInput(char* title,char * errorContent,char * resource){
+    bool isValid = true;
+    do
+    {
+        if(!isValid){
+            printf(errorContent);
+            printf(" is required.\n");
+        }
+        printf(title);
+        fgets(resource,sizeof(resource),stdin);
+        isValid = false;
+    } while (resource[0] =='\n' || resource[0] == '\0');
+    fflush(stdin);
+    if(resource[strlen(resource)- 1]== '\n'){
+        resource[strlen(resource)- 1] = '\0';
+    }
+}
 
 void displayContactDetail(contact* contacts,int contactIndex){
     contact currentContact = *(contacts + (contactIndex - 1));
@@ -232,28 +240,41 @@ void displayContactDetail(contact* contacts,int contactIndex){
     printf(" CONTACT DETAILS\n");
     displayEqualCharacter();
     printf(" First name: %s\n",currentContact.firstName);
-    printf(" Middle name: %s\n",currentContact.firstName);
-    printf(" Last name: %s\n",currentContact.firstName);
-    printf(" Company: %s\n",currentContact.firstName);
-    printf(" Phone: %s\n",currentContact.firstName);
-    printf(" Email: %s\n",currentContact.firstName);
-    printf(" Address: %s\n",currentContact.firstName);
-    printf(" Birthday: %s\n",currentContact.firstName);
-    printf(" Website: %s\n",currentContact.firstName);
-    printf(" Note: %s\n",currentContact.firstName);
-    displayThroughLine(lineWidth);
-    char* firstName = contacts[contactIndex].firstName;
-    char* middleName= contacts[contactIndex].middleName;
-    char* lastName= contacts[contactIndex].lastName;
-    int fullNameLength = strlen(firstName) + strlen(middleName) + strlen(lastName);
-    int restLength = 50 - fullNameLength;
-    displayWhiteSpace(restLength - 10);
-    printf("|\n");
-    displayThroughLine(lineWidth);
+    printf(" Middle name: %s\n",currentContact.middleName);
+    printf(" Last name: %s\n",currentContact.lastName);
+    printf(" Company: %s\n",currentContact.company);
+    printf(" Phone: %s\n",currentContact.phoneNumber);
+    printf(" Email: %s\n",currentContact.email);
+    printf(" Address: %s\n",currentContact.address);
+    printf(" Birthday: %s\n",currentContact.birthday);
+    printf(" Website: %s\n",currentContact.website);
+    printf(" Note: %s\n",currentContact.note);
+    displayEqualCharacter();
+    contactDetailSubmenu(currentContact);
+    displayEqualCharacter();
     enterToContinue();
 }
+void contactDetailSubmenu(contact currentContact){
+    int choice ;
+    bool isCorrectChoice = true;
+    printf("1. ADD TO FAVOURRITES");
+    printf("2. UPDATE");
+    printf("3. DELETE");
+    printf("4. ADD FIELD");
+    do
+    {
+        if(!isCorrectChoice){
+            printf("ARE YOU KIDDING ME? PLEASE RE-ENTER.\n");
+        }
+        choice = getIntNumber(" # YOUR CHOICE : ");
+        isCorrectChoice = false;
+    } while (choice < 1 || choice > 5);
 
+}
 
+void handleDetailContactChoice(int choice){
+
+}
 void displayEqualCharacter(){
     for (int i = 0; i < lineWidth; i++)
     {
