@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "string.h"
+struct newContactField{
+    char fieldName[100];
+    char fieldValue[100];
+}typedef newContactField;
+
 struct contact {
     char firstName[20];
     char middleName[20];
@@ -17,10 +22,6 @@ struct contact {
     newContactField* fields;
 } typedef contact;
 
-struct newContactField{
-    char fieldName[100];
-    char fieldValue[100];
-}typedef newContactField;
 
 
 const int lineWidth = 50;
@@ -37,7 +38,7 @@ void displayContactDetail(contact* contacts,int contactIndex);
 void displayEqualCharacter();
 int getIntNumber(char * title);
 void getInput(char* title,char * errorContent,char * resource);
-void contactDetailSubmenu(contact currentContact);
+void contactDetailSubmenu(contact* currentContact,int contactIndex );
 // main
 int main(int argc,char const *argv[])
 {
@@ -250,26 +251,48 @@ void displayContactDetail(contact* contacts,int contactIndex){
     printf(" Website: %s\n",currentContact.website);
     printf(" Note: %s\n",currentContact.note);
     displayEqualCharacter();
-    contactDetailSubmenu(currentContact);
+    contactDetailSubmenu(contacts,contactIndex);
     displayEqualCharacter();
+    printf("%s",(contacts + contactIndex)->isFavouriteContact ? "true" : "false");
     enterToContinue();
+    fflush(stdin);
 }
-void contactDetailSubmenu(contact currentContact){
+void contactDetailSubmenu(contact* contacts,int contactIndex ){
     int choice ;
     bool isCorrectChoice = true;
-    printf("1. ADD TO FAVOURRITES");
-    printf("2. UPDATE");
-    printf("3. DELETE");
-    printf("4. ADD FIELD");
+    contact currentContact = *(contacts + contactIndex);
+    printf(" 1. ADD TO FAVOURRITES\n");
+    printf(" 2. UPDATE\n");
+    printf(" 3. DELETE\n");
+    printf(" 4. ADD FIELD\n");
+    printf(" 5. BACK TO MAIN MENU\n");
     do
     {
         if(!isCorrectChoice){
-            printf("ARE YOU KIDDING ME? PLEASE RE-ENTER.\n");
+            printf(" ARE YOU KIDDING ME? PLEASE RE-ENTER.\n");
         }
         choice = getIntNumber(" # YOUR CHOICE : ");
         isCorrectChoice = false;
     } while (choice < 1 || choice > 5);
-
+    switch (choice)
+    {
+    case 1:
+        currentContact.isFavouriteContact = true;
+        break;
+    case 2:
+        // printf("%d",*(currentContact.isFavouriteContact));
+        break;
+    case 3:
+        // printf("%d",currentContact.isFavouriteContact);
+        break;
+    case 4:
+        // printf("%d",currentContact.isFavouriteContact);
+        break;
+    case 5:
+        return;
+    default:
+        break;
+    }
 }
 
 void handleDetailContactChoice(int choice){
