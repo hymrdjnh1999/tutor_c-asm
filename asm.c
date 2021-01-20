@@ -19,8 +19,7 @@ struct contact {
     char website[100];
     char note[100];
     bool isFavouriteContact;
-    int fieldCurrentIndex;
-    newContactField* fields;
+    newContactField fields;
 } typedef contact;
 
 
@@ -42,6 +41,7 @@ void getInput(char* title,char * errorContent,char * resource,int action);
 int contactDetailSubmenu(contact* currentContact,int contactIndex );
 void updateContact(contact* contacts , int contactIndex);
 void addNewContactField(contact* contacts,int contactIndex);
+void deleteContact(contact* contacts,int contactIndex);
 // main
 int main(int argc,char const *argv[])
 {
@@ -68,10 +68,12 @@ contact addContact(char *line ){
     // getInput(" Website : ","Website",newContact.website,action);
     // getInput(" Note : ","Note",newContact.note,action);
     newContact.isFavouriteContact = false;
-    newContact.fieldCurrentIndex = 0;
+    strcpy(newContact.fields.fieldName,"");
+    strcpy(newContact.fields.fieldValue,"");
     printf(line);
     printf("Create contact complete!\n");
     enterToContinue();
+
     return newContact;
 } 
 
@@ -247,10 +249,10 @@ void getInput(char* title,char * errorContent,char * resource,int action){
 }
 
 void displayContactDetail(contact* contacts,int contactIndex){
-    contact currentContact = *(contacts + (contactIndex - 1));
     int choice;
     while (true)
     {
+        contact currentContact = *(contacts + (contactIndex - 1));
         clearScreen();
         displayEqualCharacter();
         printf(" CONTACT DETAILS\n");
@@ -265,6 +267,10 @@ void displayContactDetail(contact* contacts,int contactIndex){
         printf(" Birthday:    %s\n",currentContact.birthday);
         printf(" Website:     %s\n",currentContact.website);
         printf(" Note:        %s\n",currentContact.note);
+        if(strlen(currentContact.fields.fieldName) && strlen(currentContact.fields.fieldValue)){
+        printf(" %s: %-9s",currentContact.fields.fieldName,"");
+        printf("%s\n",currentContact.fields.fieldValue);
+        }
         displayEqualCharacter();
         choice = contactDetailSubmenu(contacts,contactIndex - 1);
         displayEqualCharacter();
@@ -306,8 +312,9 @@ int contactDetailSubmenu(contact* contacts,int contactIndex ){
         updateContact(contacts,contactIndex);
         break;
     case 3:
-        // printf("%d",currentContact.isFavouriteContact);
-        break;
+        deleteContact(contacts,contactIndex);
+        // 5 is back to main menu
+        return 5;
     case 4:
         addNewContactField(contacts,contactIndex);
         break;
@@ -321,16 +328,12 @@ int contactDetailSubmenu(contact* contacts,int contactIndex ){
 
 void updateContact(contact* contacts , int contactIndex){
     contact newContact = contacts[contactIndex];
-    int currentFieldKey = newContact.fieldCurrentIndex;
     getInput(" Press Enter to not update,enter data to update\n First name","",newContact.firstName,1);
     getInput(" Press Enter to not update,enter data to update\n Middle name","",newContact.middleName,1);
     getInput(" Press Enter to not update,enter data to update\n Last name","",newContact.lastName,1);
-    // update field name
-    for (int count = 0; count <= currentFieldKey; count++)
-    {
-        printf(" Press Enter to not update,enter data to update\n");
-        getInput(newContact.fields[count].fieldName,"",newContact.fields[count].fieldValue,1);
-    }
+    // update field nam
+    printf(" Press Enter to not update,enter data to update\n");
+    getInput(newContact.fields.fieldName,"",newContact.fields.fieldValue,1);
     // 1
     if(strlen(newContact.firstName)){
         strcpy(contacts[contactIndex].firstName,newContact.firstName);
@@ -363,6 +366,9 @@ void updateContact(contact* contacts , int contactIndex){
     if(strlen(newContact.note)){
         strcpy(contacts[contactIndex].note,newContact.note);
     }     
+    if(strlen(newContact.fields.fieldValue)){
+        strcpy(contacts[contactIndex].fields.fieldValue,newContact.fields.fieldValue);
+    }
     // printf("value 363|%s|",contacts[contactIndex].firstName );
     printf("Complete update contact information!\n");
     enterToContinue();
@@ -376,20 +382,19 @@ void displayEqualCharacter(){
     printf("\n");
 }
 void addNewContactField(contact* contacts,int contactIndex){
-    int fieldCurrentIndex = contacts[contactIndex].fieldCurrentIndex;
-    char value[100];
+    char fieldName[100];
+    char fieldValue[100];
     newContactField newContactField;
-        // getInput(" Field Name : "," Field name",newContactField.fieldValue,0);
-        getInput(" Field Value : "," Field value",contacts[contactIndex].fields[fieldCurrentIndex].fieldValue,0);
-        printf("fieldValue: %s|\n",contacts[contactIndex].fields[fieldCurrentIndex].fieldValue);
-        // printf("fieldName : %d|\n",strlen(newContactField.fieldName));
-        getInput(" Field Name : "," Field name",value,0);
-        strcpy(newContactField.fieldName,value);
-        printf("value: %s\n",newContactField.fieldName);
-        enterToContinue();
-        printf("Do you want to add a new field?( y:yes - any:n): \n");
-        // fgets( buffer,1, stdin);
-        // sscanf(buffer,"%c",choice);
+    getInput(" Field Name : "," Field name",fieldName,0);
+    getInput(" Field Value : "," Field value",fieldValue,0);
+        // assigned value to fieldName
+    strcpy(newContactField.fieldName,fieldName);
+    strcpy(newContactField.fieldValue,fieldValue);
+    contacts[contactIndex].fields = newContactField;
+    printf("Compate add a new file!\n");
+    enterToContinue();        
+}
 
-    
+void deleteContact(contact* contacts,int contactIndex){
+
 }
