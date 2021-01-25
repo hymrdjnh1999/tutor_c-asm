@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -26,7 +27,6 @@ struct contact {
 
 const int lineWidth = 50;
 
-int enterSelect();
 void mainMenu();
 void displayContacts(contact* contact,int contactLength);
 void displayWhiteSpace(int length);
@@ -42,6 +42,8 @@ int contactDetailSubmenu(contact* currentContact,int contactIndex );
 void updateContact(contact* contacts , int contactIndex);
 void addNewContactField(contact* contacts,int contactIndex);
 void deleteContact(contact* contacts,int contactIndex);
+int readcontactfromfile(contact *contacts, int *pCount, const char*filename);
+int writecontacttofile(contact *contacts, int count, const char *filename);
 // main
 int main(int argc,char const *argv[])
 {
@@ -52,7 +54,7 @@ int main(int argc,char const *argv[])
 
 contact addContact(char *line ){
     contact newContact;
-    system("cls");
+    system("cls"); 
     printf(line);
     printf(" CREATE NEW CONTACT\n");
     printf(line);
@@ -60,61 +62,73 @@ contact addContact(char *line ){
     getInput(" First name : "," First name" ,newContact.firstName,action);
     getInput(" Middle name : "," Middle name",newContact.middleName,action);
     getInput(" Last name : "," Last name",newContact.lastName,action);
-    // getInput(" Company : ","Company",newContact.company,action);
-    // getInput(" Phone number : ","Phone number",newContact.phoneNumber,action);
-    // getInput(" Email : ","Email",newContact.email,action);
-    // getInput(" Address : ","Address",newContact.address,action);
-    // getInput(" Birthdate : ","Birthdate",newContact.birthday,action);
-    // getInput(" Website : ","Website",newContact.website,action);
-    // getInput(" Note : ","Note",newContact.note,action);
+    getInput(" Company : ","Company",newContact.company,action);
+    getInput(" Phone number : ","Phone number",newContact.phoneNumber,action);
+    getInput(" Email : ","Email",newContact.email,action);
+    getInput(" Address : ","Address",newContact.address,action);
+    getInput(" Birthdate : ","Birthdate",newContact.birthday,action);
+    getInput(" Website : ","Website",newContact.website,action);
+    getInput(" Note : ","Note",newContact.note,action);
     newContact.isFavouriteContact = false;
     strcpy(newContact.fields.fieldName,"");
     strcpy(newContact.fields.fieldValue,"");
     printf(line);
     printf("Create contact complete!\n");
     enterToContinue();
-
     return newContact;
 } 
 
 void mainMenu(char *line){
-
     int choice;
     int currentContactIndex = 0;
-    contact* contacts = malloc((1 * sizeof(contact))+ (1 * sizeof(newContactField)));
+    int size = sizeof(contact);
+    contact* contacts = malloc(size);
+    readcontactfromfile(contacts,&currentContactIndex,"contact.dat");
+    fflush(stdin);
     do
     {
-    system("cls");
-    contact newContact;
-    printf(line);
-    printf("  --- VTC ACADEMY CONTACT MANAGEMENT --- \n");
-    printf(line);
-    printf("1. SEARCH YOUR CONTACT\n");
-    printf("2. ADD CONTACT\n");
-    printf("3. DISPLAY FAVOURITE CONTACT\n");
-    printf("4. DISPLAY ALL CONTACT\n");
-    printf("5. EXIT APPLICATION\n");
-    printf(line);
-    choice = getIntNumber(" #YOUR CHOICE: ");
-    switch (choice)
-    {
-        case 1:
+        fflush(stdin);
+        system("cls");
+        printf(line);
+        printf("  --- VTC ACADEMY CONTACT MANAGEMENT --- \n");
+        printf(line);
+        printf("1. SEARCH YOUR CONTACT\n");
+        printf("2. ADD CONTACT\n");
+        printf("3. DISPLAY FAVOURITE CONTACT\n");
+        printf("4. DISPLAY ALL CONTACT\n");
+        printf("5. EXIT APPLICATION\n");
+        printf(line);
+        contact newContact;
+        choice = getIntNumber(" #YOUR CHOICE: ");
+        switch (choice)
+        {
+            case 1:
+                break;
+            case 2:
+            printf("%d",currentContactIndex);
+            getchar();
+            fflush(stdin);
+            contacts =(contact*) realloc(contacts,(currentContactIndex + 1) * sizeof(contact));
+            printf("sizeof %d",(currentContactIndex + 1) * sizeof(contact));
+            getchar(); 
+            fflush(stdin);
+            newContact = addContact(line);
+            contacts[currentContactIndex] = newContact;
+            currentContactIndex+=1;
+            writecontacttofile(contacts,currentContactIndex,"contact.dat");
+            
+                break;
+            case 3:
+                break;
+            case 4:
+                displayContacts(contacts,currentContactIndex);
+                break;
+            case 5:
+                exit(1);
+                break;
+            default:
             break;
-        case 2:
-        newContact = addContact(line);
-        contacts[currentContactIndex] = newContact;
-        ++currentContactIndex;
-        contacts =(contact*) realloc(contacts,(currentContactIndex + 1) * sizeof(contact));
-            break;
-        case 3:
-            break;
-        case 4:
-            displayContacts(contacts,currentContactIndex);
-            break;
-        case 5:
-            exit(1);
-            break;
-    }
+        }
     
     } while ( true );
 
@@ -122,7 +136,6 @@ void mainMenu(char *line){
 
 void displayFavouriteContacts(contact * contacts,int contactLength){
     clearScreen();
-    
 }
 void displayContacts(contact* contacts,int contactLength){
     clearScreen();
@@ -198,14 +211,14 @@ void enterToViewDetail(int contactLength,contact* contacts){
             isCorrectDataType = false;
         } while (sscanf(buffer,"%d",&choice) != 1);
         isCorrectRange = false;
-    } while (choice < 0 || choice > contactLength );
+    } while (choice < 0 || choice > contactLength);
     if(choice == 0){
         return;
     }
     displayContactDetail(contacts,choice);
 }
 int getIntNumber(char * title){
-    int choice ;
+    int choice;
     bool isCorrectDataType = true;
     char buffer[40];
     do
@@ -260,15 +273,15 @@ void displayContactDetail(contact* contacts,int contactIndex){
         printf(" First name:  %s\n",currentContact.firstName);
         printf(" Middle name: %s\n",currentContact.middleName);
         printf(" Last name:   %s\n",currentContact.lastName);
-        printf(" Company:     %s\n",currentContact.company);
-        printf(" Phone:       %s\n",currentContact.phoneNumber);
-        printf(" Email:       %s\n",currentContact.email);
-        printf(" Address:     %s\n",currentContact.address);
-        printf(" Birthday:    %s\n",currentContact.birthday);
-        printf(" Website:     %s\n",currentContact.website);
-        printf(" Note:        %s\n",currentContact.note);
+        // printf(" Company:     %s\n",currentContact.company);
+        // printf(" Phone:       %s\n",currentContact.phoneNumber);
+        // printf(" Email:       %s\n",currentContact.email);
+        // printf(" Address:     %s\n",currentContact.address);
+        // printf(" Birthday:    %s\n",currentContact.birthday);
+        // printf(" Website:     %s\n",currentContact.website);
+        // printf(" Note:        %s\n",currentContact.note);
         if(strlen(currentContact.fields.fieldName) && strlen(currentContact.fields.fieldValue)){
-        printf(" %s: %-9s",currentContact.fields.fieldName,"");
+        printf(" %s: ",currentContact.fields.fieldName,"");
         printf("%s\n",currentContact.fields.fieldValue);
         }
         displayEqualCharacter();
@@ -287,7 +300,7 @@ int contactDetailSubmenu(contact* contacts,int contactIndex ){
     printf(" 2. UPDATE\n");
     printf(" 3. DELETE\n");
     printf(" 4. ADD FIELD\n");
-    printf(" 5. BACK TO MAIN MENU\n");
+    printf(" 5. BACK TO MAIN MENU\n"    );
     do
     {
         if(!isCorrectChoice){
@@ -299,7 +312,7 @@ int contactDetailSubmenu(contact* contacts,int contactIndex ){
     switch (choice)
     {
     case 1:
-        if(contacts[contactIndex].isFavouriteContact){
+        if(contacts[contactIndex].isFavouriteContact  ){
             printf("This contact was favourite contact!\n");
             enterToContinue(); 
             return choice;
@@ -312,6 +325,7 @@ int contactDetailSubmenu(contact* contacts,int contactIndex ){
         updateContact(contacts,contactIndex);
         break;
     case 3:
+        printf("%d",sizeof(contacts[0]));
         deleteContact(contacts,contactIndex);
         // 5 is back to main menu
         return 5;
@@ -331,9 +345,11 @@ void updateContact(contact* contacts , int contactIndex){
     getInput(" Press Enter to not update,enter data to update\n First name","",newContact.firstName,1);
     getInput(" Press Enter to not update,enter data to update\n Middle name","",newContact.middleName,1);
     getInput(" Press Enter to not update,enter data to update\n Last name","",newContact.lastName,1);
-    // update field nam
-    printf(" Press Enter to not update,enter data to update\n");
-    getInput(newContact.fields.fieldName,"",newContact.fields.fieldValue,1);
+    // update field name
+    if(strlen(newContact.fields.fieldName) && strlen(newContact.fields.fieldValue)){
+        printf(" Press Enter to not update,enter data to update\n ");
+        getInput(newContact.fields.fieldName,"",newContact.fields.fieldValue,1);
+    }
     // 1
     if(strlen(newContact.firstName)){
         strcpy(contacts[contactIndex].firstName,newContact.firstName);
@@ -397,4 +413,37 @@ void addNewContactField(contact* contacts,int contactIndex){
 
 void deleteContact(contact* contacts,int contactIndex){
 
+}
+int readcontactfromfile(contact *contacts, int *pCount, const char*filename){
+    FILE *f;
+    int result = 0;
+    f = fopen(filename, "rb");
+    if(f!=NULL){
+        fread(pCount, 4, 1, f);
+        getchar();
+        fflush(stdin);
+        if(*pCount > 0){
+            int size =  sizeof(contact);
+            printf("%d",fread(contacts,size, *pCount, f));
+            getchar();
+            fflush(stdin);
+            result = 1;
+        }
+        fclose(f);
+    }
+    return result;
+}
+
+int writecontacttofile(contact *contacts, int count, const char *filename){
+    FILE *f;
+    int result =0;
+    f = fopen(filename, "wb");
+    if(f!=NULL){
+        fwrite(&count, sizeof(int), 1, f);
+        fwrite(contacts, sizeof(contact), count, f);
+        fclose(f);
+        result =1;
+    }
+    printf("here");
+    return result;
 }
